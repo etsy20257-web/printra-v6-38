@@ -91,16 +91,8 @@ export default function LoginPage() {
             Login with your email and password to access the studio, admin, and workspace modules.
           </p>
 
-          <div className="mt-6 space-y-4 rounded-2xl border border-emerald-300/25 bg-emerald-400/10 p-4 text-sm">
-            <p className="font-semibold text-emerald-100">Default admin account</p>
-            <p className="text-emerald-100/90">Email: <span className="font-semibold">admin@printra.local</span></p>
-            <p className="text-emerald-100/90">Password: <span className="font-semibold">Admin123!</span></p>
-          </div>
-
-          <div className="mt-4 space-y-4 rounded-2xl border border-sky-300/25 bg-sky-400/10 p-4 text-sm">
-            <p className="font-semibold text-sky-100">Default user account</p>
-            <p className="text-sky-100/90">Email: <span className="font-semibold">user@printra.local</span></p>
-            <p className="text-sky-100/90">Password: <span className="font-semibold">User12345!</span></p>
+          <div className="mt-6 rounded-2xl border border-sky-300/20 bg-sky-400/10 p-4 text-sm leading-7 text-sky-100/90">
+            Credentials are not displayed on this screen. Sign in with your registered workspace email and password.
           </div>
         </section>
 

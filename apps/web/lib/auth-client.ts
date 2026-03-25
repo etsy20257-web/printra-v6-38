@@ -5,8 +5,10 @@ import {
   type AuthUser,
   type AuthRole
 } from '@printra/shared';
+import { localLoginWithEmail, localSignupWithEmail, localValidateSession } from './local-auth';
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000').replace(/\/$/, '');
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').trim().replace(/\/$/, '');
+const HAS_REMOTE_AUTH_API = API_BASE.length > 0;
 
 type AuthResponse = {
   ok: boolean;
@@ -105,14 +107,29 @@ export function clearAuthSession() {
 }
 
 async function postAuth(path: '/login' | '/signup', payload: Record<string, unknown>) {
-  const response = await fetch(`${API_BASE}/auth${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
+  if (!HAS_REMOTE_AUTH_API) {
+    if (path === '/signup') {
+      return localSignupWithEmail(payload as { name: string; email: string; password: string });
+    }
+    return localLoginWithEmail(payload as { email: string; password: string });
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}/auth${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch {
+    throw new Error('Authentication service is unreachable.');
+  }
 
   const data = (await response.json().catch(() => ({}))) as AuthResponse;
   if (!response.ok || !data?.ok) {
+    if (response.status === 404) {
+      throw new Error('Authentication service is not configured.');
+    }
     throw new Error(data?.error || 'Authentication request failed.');
   }
 
@@ -133,11 +150,20 @@ export async function loginWithEmail(payload: { email: string; password: string 
 }
 
 export async function validateAuthSession(token: string) {
-  const response = await fetch(`${API_BASE}/auth/session`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
+  if (!HAS_REMOTE_AUTH_API) {
+    return localValidateSession(token);
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}/auth/session`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+  } catch {
+    return null;
+  }
 
   const data = (await response.json().catch(() => ({}))) as AuthResponse;
   if (!response.ok || !data?.ok) {
