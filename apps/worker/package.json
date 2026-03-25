@@ -1,0 +1,15 @@
+{
+  "name": "@printra/worker",
+  "version": "0.1.5",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "bullmq": "^5.34.10",
+    "dotenv": "^16.6.1",
+    "yazl": "^3.3.1"
+  }
+}

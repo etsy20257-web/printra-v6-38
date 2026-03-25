@@ -1,0 +1,127 @@
+{
+  "account": {
+    "workspaceName": "Main Workspace",
+    "billingEmail": "billing@printra.local",
+    "currentPlanId": "growth",
+    "billingCycle": "monthly",
+    "seats": 3,
+    "autoRenew": true,
+    "paymentMethodSummary": "Visa •••• 4242",
+    "nextInvoiceAt": "2026-04-24T17:42:05.839Z",
+    "updatedAt": "2026-03-24T17:42:05.839Z",
+    "createdAt": "2026-03-24T17:42:05.839Z"
+  },
+  "usage": {
+    "periodStart": "2026-03-24T17:42:05.839Z",
+    "periodEnd": "2026-04-24T17:42:05.839Z",
+    "analysesUsed": 260,
+    "storageUsedGb": 6.1,
+    "teamMembersActive": 3,
+    "projectsActive": 20
+  },
+  "invoices": [
+    {
+      "id": "growth-monthly-current",
+      "number": "INV-GROWTH-MONTHLY-CURRENT",
+      "planId": "growth",
+      "amount": 49,
+      "currency": "USD",
+      "status": "open",
+      "issuedAt": "2026-03-24T17:42:05.839Z",
+      "dueAt": "2026-04-24T17:42:05.839Z",
+      "paidAt": null
+    },
+    {
+      "id": "growth-monthly-history-1",
+      "number": "INV-GROWTH-MONTHLY-HISTORY-1",
+      "planId": "growth",
+      "amount": 49,
+      "currency": "USD",
+      "status": "paid",
+      "issuedAt": "2026-02-24T17:42:05.839Z",
+      "dueAt": "2026-03-24T17:42:05.839Z",
+      "paidAt": "2026-02-24T17:42:05.839Z"
+    },
+    {
+      "id": "growth-monthly-history-2",
+      "number": "INV-GROWTH-MONTHLY-HISTORY-2",
+      "planId": "growth",
+      "amount": 49,
+      "currency": "USD",
+      "status": "paid",
+      "issuedAt": "2026-01-24T17:42:05.839Z",
+      "dueAt": "2026-02-24T17:42:05.839Z",
+      "paidAt": "2026-01-24T17:42:05.839Z"
+    },
+    {
+      "id": "growth-monthly-history-3",
+      "number": "INV-GROWTH-MONTHLY-HISTORY-3",
+      "planId": "growth",
+      "amount": 49,
+      "currency": "USD",
+      "status": "paid",
+      "issuedAt": "2025-12-24T17:42:05.839Z",
+      "dueAt": "2026-01-24T17:42:05.839Z",
+      "paidAt": "2025-12-24T17:42:05.839Z"
+    }
+  ],
+  "availablePlans": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "monthlyPrice": 19,
+      "yearlyPrice": 190,
+      "projectLimit": 10,
+      "analysisLimit": 100,
+      "seatsIncluded": 1,
+      "overagePerSeat": 9,
+      "features": [
+        "10 active projects",
+        "100 analyses / month",
+        "Email support"
+      ]
+    },
+    {
+      "id": "growth",
+      "name": "Growth",
+      "monthlyPrice": 49,
+      "yearlyPrice": 490,
+      "projectLimit": 50,
+      "analysisLimit": 500,
+      "seatsIncluded": 3,
+      "overagePerSeat": 12,
+      "features": [
+        "50 active projects",
+        "500 analyses / month",
+        "Priority support"
+      ]
+    },
+    {
+      "id": "scale",
+      "name": "Scale",
+      "monthlyPrice": 99,
+      "yearlyPrice": 990,
+      "projectLimit": 200,
+      "analysisLimit": 2500,
+      "seatsIncluded": 10,
+      "overagePerSeat": 15,
+      "features": [
+        "200 active projects",
+        "2,500 analyses / month",
+        "Team workflow support"
+      ]
+    }
+  ],
+  "foundation": "local-json-billing",
+  "summary": {
+    "id": "growth",
+    "name": "Growth",
+    "includedSeats": 3,
+    "projectLimit": 50,
+    "analysisLimit": 500,
+    "billingCycle": "monthly",
+    "seatOverage": 0,
+    "total": 49,
+    "currency": "USD"
+  }
+}

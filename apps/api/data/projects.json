@@ -1,0 +1,41 @@
+[
+  {
+    "id": "254704b1-923a-4f40-9273-14386b94b92f",
+    "name": "Spring launch workspace",
+    "slug": "spring-launch-workspace",
+    "description": "Starter project for mockups, listings, and saved automatic-analysis snapshots.",
+    "status": "active",
+    "sceneCount": 3,
+    "assetCount": 12,
+    "outputCount": 4,
+    "favorite": true,
+    "archived": false,
+    "tags": [
+      "studio",
+      "launch"
+    ],
+    "updatedAt": "2026-03-24T17:39:42.622Z",
+    "createdAt": "2026-03-24T17:39:42.622Z",
+    "lastSavedSource": "projects-route",
+    "studioState": null
+  },
+  {
+    "id": "49086165-b80c-4938-87e6-3fc56866e4d4",
+    "name": "Evergreen catalog batch",
+    "slug": "evergreen-catalog-batch",
+    "description": "Used for repeatable catalog exports and future batch packaging.",
+    "status": "draft",
+    "sceneCount": 1,
+    "assetCount": 5,
+    "outputCount": 0,
+    "favorite": false,
+    "archived": false,
+    "tags": [
+      "batch"
+    ],
+    "updatedAt": "2026-03-24T17:39:42.622Z",
+    "createdAt": "2026-03-24T17:39:42.622Z",
+    "lastSavedSource": "projects-route",
+    "studioState": null
+  }
+]

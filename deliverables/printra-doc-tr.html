@@ -1,0 +1,366 @@
+﻿<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Printra Proje Dokümantasyonu (TR)</title>
+  <style>
+    :root { --text:#0f172a; --muted:#475569; --line:#cbd5e1; --bg:#ffffff; --code:#0b1220; }
+    html,body{background:var(--bg);color:var(--text);font-family:"Segoe UI",Arial,sans-serif;line-height:1.45;font-size:12px;margin:0}
+    .wrap{max-width:980px;margin:0 auto;padding:28px}
+    h1,h2,h3{margin:0 0 10px 0;line-height:1.25}
+    h1{font-size:28px}
+    h2{font-size:19px;margin-top:28px;border-top:1px solid var(--line);padding-top:14px}
+    h3{font-size:15px;margin-top:18px}
+    p{margin:8px 0}
+    ul{margin:8px 0 8px 18px;padding:0}
+    li{margin:4px 0}
+    code{font-family:Consolas,"Courier New",monospace;background:#f1f5f9;padding:1px 4px;border-radius:4px}
+    pre{font-family:Consolas,"Courier New",monospace;background:var(--code);color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+    table{width:100%;border-collapse:collapse;margin:10px 0}
+    th,td{border:1px solid var(--line);padding:8px;vertical-align:top}
+    th{background:#f8fafc;text-align:left}
+    .meta{color:var(--muted);font-size:11px}
+    .badge{display:inline-block;border:1px solid #94a3b8;border-radius:999px;padding:2px 8px;font-size:11px;margin-right:6px}
+    .small{font-size:11px;color:var(--muted)}
+    @page{size:A4;margin:16mm}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Printra Müşteri Teslim Dokümantasyonu (Türkçe)</h1>
+    <p class="meta">Sürüm: <strong>0.1.5</strong> | Tarih: <strong>25 Mart 2026</strong> | Belge tipi: <strong>Uçtan Uca Teknik + Operasyonel</strong></p>
+    <p>
+      <span class="badge">Monorepo</span>
+      <span class="badge">Web + API + Worker</span>
+      <span class="badge">Studio + Mockup</span>
+      <span class="badge">Automatic Analysis + Chrome Extension</span>
+    </p>
+
+    <h2>1. Proje Özeti</h2>
+    <p>
+      Printra; tasarım, mockup, rakip analizi, içerik üretimi, proje yönetimi, admin/billing ve platform operasyonlarını
+      tek panelde birleştiren bir SaaS çekirdeğidir. Sistem "müşteri sahipli altyapı" modeline göre hazırlanmıştır:
+      geliştirme aşamasında gerçek müşteri servis hesapları kod içine gömülmez, canlı aktivasyon müşteri altyapısı ile yapılır.
+    </p>
+
+    <h2>2. Mimari ve Bileşenler</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Bileşen</th>
+          <th>Yol</th>
+          <th>Teknoloji</th>
+          <th>Sorumluluk</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Web Uygulaması</td>
+          <td><code>apps/web</code></td>
+          <td>Next.js 15, React 18</td>
+          <td>Tüm kullanıcı arayüzü, Studio, paneller, çok dil, tema, yönlendirme</td>
+        </tr>
+        <tr>
+          <td>API Servisi</td>
+          <td><code>apps/api</code></td>
+          <td>Node.js, Express, Zod, pg, AWS S3 SDK (R2)</td>
+          <td>İş mantığı, veri endpointleri, storage, analiz, admin/billing/settings, export job oluşturma</td>
+        </tr>
+        <tr>
+          <td>Worker</td>
+          <td><code>apps/worker</code></td>
+          <td>Node.js, yazl</td>
+          <td>Export kuyruğundaki işleri işleyip ZIP çıktı üretme</td>
+        </tr>
+        <tr>
+          <td>Chrome Eklentisi</td>
+          <td><code>apps/extension</code></td>
+          <td>Manifest v3</td>
+          <td>Etsy sayfalarından veri yakalama, Automatic Analysis API’ine gönderme</td>
+        </tr>
+        <tr>
+          <td>UI Paketi</td>
+          <td><code>packages/ui</code></td>
+          <td>React bileşenleri</td>
+          <td>AppShell, Panel, MetricCard, tema/locale kontrolleri</td>
+        </tr>
+        <tr>
+          <td>i18n Paketi</td>
+          <td><code>packages/i18n</code></td>
+          <td>React context tabanlı</td>
+          <td>12 dil, anahtar-temelli çeviri yönetimi</td>
+        </tr>
+        <tr>
+          <td>Shared Paketi</td>
+          <td><code>packages/shared</code></td>
+          <td>TypeScript</td>
+          <td>Navigasyon ve paylaşılan tipler</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>3. Kategori Bazlı Özellikler</h2>
+
+    <h3>3.1 Dashboard</h3>
+    <ul>
+      <li>Canlı sağlık verisi, storage readiness, extension durumu, son analiz snapshot’ları.</li>
+      <li>API kaynakları: <code>GET /health</code>, <code>GET /automatic-analysis/history</code>, <code>GET /automatic-analysis/extension-status</code>, <code>GET /storage/foundation</code>.</li>
+      <li>Müşteriye yönelik handoff modelinin anlık görünümü.</li>
+    </ul>
+
+    <h3>3.2 Projects</h3>
+    <ul>
+      <li>Proje oluşturma, güncelleme, çoğaltma, favori, arşivleme, silme.</li>
+      <li>Studio ile proje-id seviyesinde senkron çalışır.</li>
+      <li>API: <code>/projects</code> altında CRUD + <code>/duplicate</code> + <code>/studio-state</code>.</li>
+      <li>Yerel temel veri kaydı: <code>apps/api/data/projects.json</code>.</li>
+    </ul>
+
+    <h3>3.3 Studio</h3>
+    <ul>
+      <li>Canva-benzeri düzenleme, mockup stage yönetimi, design/multi-stage çalışma.</li>
+      <li>Objeler: text, image, shape, mockup. Drag/resize/rotate aktif.</li>
+      <li>Mockup projection presetleri: flat-front, relaxed-front, oversize-front, hoodie-front, sleeve-badge.</li>
+      <li>Library drawer: Mockups / Designs / Tools paneli.</li>
+      <li>Tüm sahneyi temizleme butonu (clear scene) mevcut.</li>
+      <li>Export akışı: server-side export job + worker ZIP üretimi.</li>
+    </ul>
+
+    <h3>3.4 Library</h3>
+    <ul>
+      <li>Section yönetimi (mockup/design), asset listeleme, çoğaltma, silme, yükleme.</li>
+      <li>Storage modu iki katmanlıdır:
+        <ul>
+          <li><strong>Local JSON Foundation:</strong> DB yokken güvenli fallback.</li>
+          <li><strong>Database + R2:</strong> DATABASE_URL ve gerçek R2 bilgileri geldiğinde canlı mod.</li>
+        </ul>
+      </li>
+      <li>API: <code>/storage/foundation</code>, <code>/storage/sections</code>, <code>/storage/assets</code>, <code>/storage/uploads/prepare</code>, <code>/storage/uploads/finalize</code>.</li>
+    </ul>
+
+    <h3>3.5 Analytics</h3>
+    <ul>
+      <li>Automatic Analysis sonuç geçmişinin snapshot bazlı görünümü.</li>
+      <li>Batch karşılaştırma için temel veri yapısı hazır.</li>
+    </ul>
+
+    <h3>3.6 Automatic Analysis (Rakip Analizi)</h3>
+    <ul>
+      <li>Modlar: URL, paste, manual, CSV.</li>
+      <li>Skorlar: listingStrength, storeStrength, keywordStrength, trustScore, competitionDifficulty, opportunityScore, conversionQuality, demandHeat.</li>
+      <li>Risk flag, opportunity notes, beat map üretir.</li>
+      <li>API: <code>POST /automatic-analysis/analyze</code>, <code>POST /automatic-analysis/save</code>, <code>GET /automatic-analysis/history</code>.</li>
+      <li>Extension handshake: <code>/automatic-analysis/extension-status</code> ve <code>/automatic-analysis/extension-ingest</code>.</li>
+    </ul>
+
+    <h3>3.7 Create a List</h3>
+    <ul>
+      <li>SEO + GEO + AEO odaklı başlık/açıklama/keyword üretimi.</li>
+      <li>13 anahtar kelime kuralı, kalite skoru ve iyileştirme notları.</li>
+      <li>Varsayılan rule-based; <code>OPENAI_API_KEY</code> varsa AI-assisted moda geçebilir.</li>
+      <li>API: <code>GET /market-intelligence/foundation</code>, <code>POST /market-intelligence/create-list</code>.</li>
+    </ul>
+
+    <h3>3.8 Settings</h3>
+    <ul>
+      <li>Profil/workspace, lokalizasyon, görünüm, studio default ayarları.</li>
+      <li>API: <code>GET /settings</code>, <code>PUT /settings</code>, <code>POST /settings/reset</code>.</li>
+    </ul>
+
+    <h3>3.9 Billing</h3>
+    <ul>
+      <li>Plan seçimi, cycle, seat, auto renew, charge preview, usage, invoices.</li>
+      <li>API: <code>GET /billing</code>, <code>PUT /billing</code>, <code>POST /billing/reset</code>.</li>
+      <li>Yerel temel veri: <code>apps/api/data/billing.json</code>.</li>
+    </ul>
+
+    <h3>3.10 Admin</h3>
+    <ul>
+      <li>Kullanıcı matrisi, rol şeması, plan/access policy, davetler, audit.</li>
+      <li>API: <code>GET /admin</code>, <code>PUT /admin</code>, <code>POST /admin/reset</code>.</li>
+      <li>Yerel temel veri: <code>apps/api/data/admin.json</code>.</li>
+    </ul>
+
+    <h3>3.11 Platform</h3>
+    <ul>
+      <li>Sistem health board, connector readiness (Google Drive/OneDrive), extension heartbeat.</li>
+      <li>API: <code>/health</code>, <code>/connectors/foundation</code>, <code>/automatic-analysis/extension-status</code>.</li>
+    </ul>
+
+    <h2>4. Çalışma Sistemleri (İş Akışları)</h2>
+
+    <h3>4.1 Studio Persist + Autosave Mimarisi</h3>
+    <ul>
+      <li>Local draft: IndexedDB (<code>printra-studio</code>) + runtime snapshot.</li>
+      <li>Project scoped draft key: <code>project:{projectId}</code> mantığı.</li>
+      <li>Local autosave debounce: <code>35ms</code>.</li>
+      <li>Server autosave minimum aralık: <code>3000ms</code>.</li>
+      <li>Hash/route tabanlı panel açma: <code>#mockups</code>, <code>#designs</code>, <code>#tools</code>.</li>
+      <li>Panel/route geçişinde flush mekanizması: <code>window.__printraFlushStudioDraft</code>.</li>
+    </ul>
+
+    <h3>4.2 Library Storage Modu</h3>
+    <ul>
+      <li>DB yoksa sistem kapanmaz; local-json foundation ile devam eder.</li>
+      <li>DB + R2 aktifse signed upload ve finalize akışı devreye girer.</li>
+      <li>Müşteri credential’ı yoksa API kontrollü 503 + açıklayıcı not döndürür (crash yerine).</li>
+    </ul>
+
+    <h3>4.3 Automatic Analysis + Extension Akışı</h3>
+    <ul>
+      <li>Content script Etsy sayfasını okur, background script API’ye iletir.</li>
+      <li>Extension status TTL: yaklaşık 15 dakika.</li>
+      <li>Ingest sonrası analiz motoru çalışır, istenirse snapshot kaydedilir.</li>
+    </ul>
+
+    <h3>4.4 Export Sistemi</h3>
+    <ul>
+      <li>Web, export payload’ı API’ye atar (<code>POST /exports</code>).</li>
+      <li>API queue/status dosyası üretir.</li>
+      <li>Worker queue’yu alır, ZIP üretir, status’u completed yapar.</li>
+      <li>Web indirme endpointi: <code>GET /exports/{jobId}/download</code>.</li>
+    </ul>
+
+    <h2>5. Ortam Değişkenleri</h2>
+    <h3>5.1 API (.env)</h3>
+    <pre>PORT=4000
+DATABASE_URL=postgresql://...
+R2_ACCOUNT_ID=...
+R2_BUCKET=...
+R2_REGION=auto
+R2_ACCESS_KEY_ID=...
+R2_SECRET_ACCESS_KEY=...
+R2_PUBLIC_BASE_URL=
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-5</pre>
+
+    <h3>5.2 Web (.env.local)</h3>
+    <pre>NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
+NEXT_PUBLIC_DEFAULT_ORGANIZATION_ID=...
+NEXT_PUBLIC_CHROME_EXTENSION_URL=https://chrome.google.com/webstore/detail/EXTENSION_ID
+NEXT_PUBLIC_EDGE_EXTENSION_URL=https://microsoftedge.microsoft.com/addons/detail/EXTENSION_ID
+NEXT_PUBLIC_OPERA_EXTENSION_URL=https://addons.opera.com/extensions/details/EXTENSION_ID</pre>
+
+    <h2>6. CMD Çalıştırma Komutları</h2>
+
+    <h3>6.1 Local Development</h3>
+    <pre>cd /d C:\Users\etsy2\OneDrive\Belgeler\New project\analysis-unzip
+pnpm.cmd install
+
+:: API (ayrı pencere)
+pnpm.cmd dev:api
+
+:: WEB (ayrı pencere)
+pnpm.cmd dev:web
+
+:: Worker (opsiyonel, export için)
+pnpm.cmd --filter @printra/worker dev</pre>
+
+    <h3>6.2 İlk Kurulum (DB + Org Bootstrap)</h3>
+    <pre>curl -X POST http://localhost:4000/setup/bootstrap-database
+curl -X POST http://localhost:4000/setup/bootstrap-organization ^
+  -H "Content-Type: application/json" ^
+  -d "{\"name\":\"Main Workspace\",\"slug\":\"main-workspace\",\"plan\":\"starter\"}"</pre>
+
+    <h3>6.3 Build</h3>
+    <pre>cd /d C:\Users\etsy2\OneDrive\Belgeler\New project\analysis-unzip
+pnpm.cmd --filter @printra/web build</pre>
+
+    <h2>7. GitHub Yayınlama Rehberi</h2>
+    <pre>cd /d C:\Users\etsy2\OneDrive\Belgeler\New project\analysis-unzip
+git init
+git add .
+git commit -m "Printra initial release"
+git branch -M main
+git remote add origin https://github.com/<kullanici>/<repo>.git
+git push -u origin main</pre>
+
+    <p class="small">Not: Eğer mevcut repo varsa sadece <code>git add/commit/push</code> akışını kullanın.</p>
+
+    <h2>8. Vercel Yayınlama + Domain Ekleme</h2>
+
+    <h3>8.1 Web Deploy (Monorepo içinden)</h3>
+    <pre>cd /d C:\Users\etsy2\OneDrive\Belgeler\New project\analysis-unzip
+pnpm dlx vercel@latest login
+pnpm dlx vercel@latest --cwd apps/web
+pnpm dlx vercel@latest --cwd apps/web --prod</pre>
+
+    <h3>8.2 Vercel Environment Variables (Web Projesi)</h3>
+    <ul>
+      <li><code>NEXT_PUBLIC_API_BASE_URL=https://api.senin-domainin.com</code></li>
+      <li><code>NEXT_PUBLIC_DEFAULT_ORGANIZATION_ID=...</code></li>
+      <li>Extension store URL değişkenleri (opsiyonel ama önerilir)</li>
+    </ul>
+
+    <h3>8.3 Domain Ekleme</h3>
+    <pre>pnpm dlx vercel@latest domains add senin-domainin.com
+pnpm dlx vercel@latest domains add www.senin-domainin.com
+pnpm dlx vercel@latest domains inspect senin-domainin.com</pre>
+    <p>DNS tarafında Vercel’in verdiği A/CNAME kayıtlarını domain paneline girin.</p>
+
+    <h3>8.4 API/Worker Yayın Notu</h3>
+    <p>
+      Bu repoda API Express servisidir, worker ise sürekli çalışan process’tir.
+      Üretimde API + worker için ayrı Node runtime (VPS / Render / Railway / Fly.io vb.) önerilir.
+      Web tarafı Vercel’de, API tarafı ayrı hostta çalıştırılıp <code>NEXT_PUBLIC_API_BASE_URL</code> ile bağlanır.
+    </p>
+
+    <h2>9. Chrome Extension (Rakip Analizi İçin Zorunlu)</h2>
+    <ul>
+      <li>Eklenti yolu: <code>apps/extension</code></li>
+      <li>Manifest: v3</li>
+      <li>Host permission: Etsy + local API/Web adresleri</li>
+      <li>Popup üzerinden API Base ayarlanabilir.</li>
+    </ul>
+
+    <h3>9.1 Müşteri Kurulumu (Geliştirme/Test)</h3>
+    <ol>
+      <li>Chrome <code>chrome://extensions</code> aç.</li>
+      <li><strong>Developer mode</strong> aç.</li>
+      <li><strong>Load unpacked</strong> ile extension klasörünü seç.</li>
+      <li>Etsy listing/shop sayfasında "Analyze" / "Sync status" aksiyonlarını kullan.</li>
+    </ol>
+
+    <h3>9.2 Production Notu</h3>
+    <p>
+      Müşteri canlı domainine geçildiğinde <code>manifest.json</code> içindeki host izinleri canlı API/Web URL’lerine göre güncellenmelidir.
+    </p>
+
+    <h2>10. Geliştirme Yol Haritası (Önerilen)</h2>
+    <h3>Faz 1 - Performans ve Stabilite</h3>
+    <ul>
+      <li>Studio render pipeline profiling (özellikle çok sayıda mockup/design sahnesi).</li>
+      <li>Virtualization ve incremental hydrate stratejileri.</li>
+      <li>Autosave conflict resolution telemetry.</li>
+    </ul>
+
+    <h3>Faz 2 - Altyapı Sertleştirme</h3>
+    <ul>
+      <li>DB migration yönetimi (sürüm kontrollü).</li>
+      <li>R2 canlı upload doğrulama + thumbnail pipeline.</li>
+      <li>API auth, rate limit, audit genişletme.</li>
+    </ul>
+
+    <h3>Faz 3 - Üretim Operasyonu</h3>
+    <ul>
+      <li>Merkezi logging, metrik, alarm.</li>
+      <li>Backup/restore politikası.</li>
+      <li>SLA ve incident runbook.</li>
+    </ul>
+
+    <h2>11. Teslim Kontrol Listesi</h2>
+    <ul>
+      <li>Web + API + Worker processleri ayrı ayrı ayağa kalkıyor.</li>
+      <li>Studio’da kategori geçişlerinde mockup/tasarım korunuyor.</li>
+      <li>Automatic Analysis extension status heartbeat düşmüyor.</li>
+      <li>Create a List hem rule-based hem AI-assisted modda doğrulandı.</li>
+      <li>Library section/asset CRUD çalışıyor.</li>
+      <li>Export job oluşturma ve ZIP indirme doğrulandı.</li>
+      <li>Admin/Billing/Settings panellerinde kayıt-reset akışları çalışıyor.</li>
+    </ul>
+
+    <p class="small">Bu belge, mevcut kod tabanının gerçek yapısı üzerinden hazırlanmıştır. Dağıtım ortamına özel ek güvenlik/adaptasyon adımları ayrıca planlanmalıdır.</p>
+  </div>
+</body>
+</html>

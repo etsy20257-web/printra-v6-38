@@ -1,0 +1,151 @@
+{
+  "foundation": "local-json-admin",
+  "workspace": {
+    "workspaceName": "Main Workspace",
+    "organizationId": "demo-org",
+    "primaryDomain": "printra.local",
+    "supportEmail": "ops@printra.local",
+    "defaultPlanId": "growth",
+    "trialDays": 14
+  },
+  "users": [
+    {
+      "id": "usr-owner",
+      "name": "Ömer Y.",
+      "email": "owner@printra.local",
+      "role": "owner",
+      "status": "active",
+      "planScope": "scale",
+      "mfaEnabled": true,
+      "lastActiveAt": "2026-03-20T09:10:42.320Z"
+    },
+    {
+      "id": "usr-admin",
+      "name": "Platform Admin",
+      "email": "admin@printra.local",
+      "role": "admin",
+      "status": "active",
+      "planScope": "growth",
+      "mfaEnabled": true,
+      "lastActiveAt": "2026-03-19T09:10:42.320Z"
+    },
+    {
+      "id": "usr-manager",
+      "name": "Operations Manager",
+      "email": "manager@printra.local",
+      "role": "manager",
+      "status": "active",
+      "planScope": "growth",
+      "mfaEnabled": false,
+      "lastActiveAt": "2026-03-18T09:10:42.320Z"
+    }
+  ],
+  "roles": [
+    {
+      "key": "owner",
+      "name": "Owner",
+      "description": "Tam yetki, workspace ve plan devri dahil.",
+      "permissions": [
+        "workspace.manage",
+        "billing.manage",
+        "users.manage",
+        "roles.manage",
+        "audit.read"
+      ]
+    },
+    {
+      "key": "admin",
+      "name": "Admin",
+      "description": "Operasyon, erişim ve kullanıcı yönetimi.",
+      "permissions": [
+        "users.manage",
+        "roles.manage",
+        "billing.read",
+        "access.manage",
+        "audit.read"
+      ]
+    },
+    {
+      "key": "manager",
+      "name": "Manager",
+      "description": "Takım, proje ve kullanım takibi.",
+      "permissions": [
+        "users.read",
+        "projects.manage",
+        "usage.read"
+      ]
+    },
+    {
+      "key": "member",
+      "name": "Member",
+      "description": "Standart uygulama kullanıcısı.",
+      "permissions": [
+        "projects.read",
+        "projects.write"
+      ]
+    },
+    {
+      "key": "billing",
+      "name": "Billing",
+      "description": "Faturalama görünümü ve ödeme iletişimleri.",
+      "permissions": [
+        "billing.read",
+        "invoices.read"
+      ]
+    }
+  ],
+  "planPolicies": {
+    "enforceSeatCap": true,
+    "seatCap": 25,
+    "allowSelfServeUpgrades": true,
+    "requireApprovalForDowngrades": true,
+    "defaultPlanId": "growth",
+    "allowedPlanIds": [
+      "starter",
+      "growth",
+      "scale"
+    ]
+  },
+  "accessPolicies": {
+    "ssoRequiredForPrivilegedUsers": false,
+    "enforceMfaForAdmins": true,
+    "sessionTimeoutMinutes": 480,
+    "auditRetentionDays": 180,
+    "ipAllowlistEnabled": false,
+    "ipAllowlist": [],
+    "inviteDomainAllowlist": [
+      "printra.local"
+    ]
+  },
+  "invitations": [
+    {
+      "id": "inv-billing",
+      "email": "billing@printra.local",
+      "role": "billing",
+      "status": "pending",
+      "invitedBy": "owner@printra.local",
+      "createdAt": "2026-03-20T09:10:42.320Z",
+      "expiresAt": "2026-03-27T09:10:42.320Z"
+    }
+  ],
+  "auditLog": [
+    {
+      "id": "audit-01",
+      "actor": "system",
+      "action": "workspace.bootstrap",
+      "target": "admin-store",
+      "severity": "info",
+      "createdAt": "2026-03-20T09:10:42.320Z"
+    },
+    {
+      "id": "audit-02",
+      "actor": "owner@printra.local",
+      "action": "policy.mfa.enabled",
+      "target": "access-policies",
+      "severity": "warning",
+      "createdAt": "2026-03-18T09:10:42.320Z"
+    }
+  ],
+  "createdAt": "2026-03-20T09:10:42.320Z",
+  "updatedAt": "2026-03-20T09:10:42.320Z"
+}

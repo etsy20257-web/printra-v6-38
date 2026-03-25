@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "createdAt": "2026-03-25T20:41:02.838Z",
+  "updatedAt": "2026-03-25T21:44:53.616Z",
+  "users": [
+    {
+      "id": "usr-admin-root",
+      "name": "Printra Admin",
+      "email": "admin@printra.local",
+      "role": "admin",
+      "passwordHash": "39dacf3afc90dd8e25367fe156bf08e1:5e805e8caecac874b7660ee231fee988ab7f498476e9479f9d941d9a5a78974609af7ef7b4c217eceb0cecaadc7eef7a9899896b4a4befde5f30ca1a3ba2aaf0",
+      "createdAt": "2026-03-25T20:41:02.838Z",
+      "updatedAt": "2026-03-25T21:44:53.616Z",
+      "lastLoginAt": "2026-03-25T21:44:53.616Z"
+    },
+    {
+      "id": "usr-member-root",
+      "name": "Printra Member",
+      "email": "user@printra.local",
+      "role": "user",
+      "passwordHash": "2e91e9cbc631e448e3dd79911ff7fee6:d1a231246b3eb2f49de08b0f83349fc850b296e05a4a36542da0d54b0924ed1d07219d332e10429515a652888d01d4d64fcdb68e9e62d86094bebe2b2133f0b6",
+      "createdAt": "2026-03-25T20:41:02.838Z",
+      "updatedAt": "2026-03-25T20:41:02.838Z",
+      "lastLoginAt": null
+    }
+  ]
+}

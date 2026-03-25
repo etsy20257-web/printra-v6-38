@@ -1,0 +1,368 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Printra Project Documentation (EN)</title>
+  <style>
+    :root { --text:#0f172a; --muted:#475569; --line:#cbd5e1; --bg:#ffffff; --code:#0b1220; }
+    html,body{background:var(--bg);color:var(--text);font-family:"Segoe UI",Arial,sans-serif;line-height:1.45;font-size:12px;margin:0}
+    .wrap{max-width:980px;margin:0 auto;padding:28px}
+    h1,h2,h3{margin:0 0 10px 0;line-height:1.25}
+    h1{font-size:28px}
+    h2{font-size:19px;margin-top:28px;border-top:1px solid var(--line);padding-top:14px}
+    h3{font-size:15px;margin-top:18px}
+    p{margin:8px 0}
+    ul{margin:8px 0 8px 18px;padding:0}
+    li{margin:4px 0}
+    code{font-family:Consolas,"Courier New",monospace;background:#f1f5f9;padding:1px 4px;border-radius:4px}
+    pre{font-family:Consolas,"Courier New",monospace;background:var(--code);color:#e2e8f0;padding:12px;border-radius:8px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+    table{width:100%;border-collapse:collapse;margin:10px 0}
+    th,td{border:1px solid var(--line);padding:8px;vertical-align:top}
+    th{background:#f8fafc;text-align:left}
+    .meta{color:var(--muted);font-size:11px}
+    .badge{display:inline-block;border:1px solid #94a3b8;border-radius:999px;padding:2px 8px;font-size:11px;margin-right:6px}
+    .small{font-size:11px;color:var(--muted)}
+    @page{size:A4;margin:16mm}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Printra Customer Delivery Documentation (English)</h1>
+    <p class="meta">Version: <strong>0.1.5</strong> | Date: <strong>March 25, 2026</strong> | Document Type: <strong>End-to-End Technical + Operational</strong></p>
+    <p>
+      <span class="badge">Monorepo</span>
+      <span class="badge">Web + API + Worker</span>
+      <span class="badge">Studio + Mockup</span>
+      <span class="badge">Automatic Analysis + Chrome Extension</span>
+    </p>
+
+    <h2>1. Project Overview</h2>
+    <p>
+      Printra is a SaaS core that unifies design, mockup workflows, competitor analysis, content generation,
+      project management, admin/billing, and platform operations in one shell. The system follows a
+      "customer-owned infrastructure" delivery model: real customer credentials are not hardcoded during development,
+      and final live activation is completed on customer infrastructure.
+    </p>
+
+    <h2>2. Architecture and Components</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Path</th>
+          <th>Technology</th>
+          <th>Responsibility</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Web Application</td>
+          <td><code>apps/web</code></td>
+          <td>Next.js 15, React 18</td>
+          <td>UI routes, Studio, panels, localization, theme, navigation</td>
+        </tr>
+        <tr>
+          <td>API Service</td>
+          <td><code>apps/api</code></td>
+          <td>Node.js, Express, Zod, pg, AWS S3 SDK (R2)</td>
+          <td>Business logic, storage, analysis, admin/billing/settings, export job creation</td>
+        </tr>
+        <tr>
+          <td>Worker</td>
+          <td><code>apps/worker</code></td>
+          <td>Node.js, yazl</td>
+          <td>Consumes export queue jobs and produces ZIP output</td>
+        </tr>
+        <tr>
+          <td>Chrome Extension</td>
+          <td><code>apps/extension</code></td>
+          <td>Manifest v3</td>
+          <td>Captures Etsy data and sends payload to Automatic Analysis API</td>
+        </tr>
+        <tr>
+          <td>UI Package</td>
+          <td><code>packages/ui</code></td>
+          <td>React components</td>
+          <td>AppShell, Panel, MetricCard, theme/locale controls</td>
+        </tr>
+        <tr>
+          <td>i18n Package</td>
+          <td><code>packages/i18n</code></td>
+          <td>React context</td>
+          <td>12-language localization key system</td>
+        </tr>
+        <tr>
+          <td>Shared Package</td>
+          <td><code>packages/shared</code></td>
+          <td>TypeScript</td>
+          <td>Shared navigation and common types</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>3. Category-by-Category Features</h2>
+
+    <h3>3.1 Dashboard</h3>
+    <ul>
+      <li>Live health, storage readiness, extension status, and latest analysis snapshots.</li>
+      <li>API sources: <code>GET /health</code>, <code>GET /automatic-analysis/history</code>, <code>GET /automatic-analysis/extension-status</code>, <code>GET /storage/foundation</code>.</li>
+      <li>Operational handoff status for customer deployment.</li>
+    </ul>
+
+    <h3>3.2 Projects</h3>
+    <ul>
+      <li>Create, update, duplicate, favorite, archive, and delete project workspaces.</li>
+      <li>Bidirectional synchronization with Studio via project id.</li>
+      <li>API: <code>/projects</code> CRUD + <code>/duplicate</code> + <code>/studio-state</code>.</li>
+      <li>Local foundation file: <code>apps/api/data/projects.json</code>.</li>
+    </ul>
+
+    <h3>3.3 Studio</h3>
+    <ul>
+      <li>Canva-style editing, mockup stage management, design-to-mockup projection.</li>
+      <li>Object types: text, image, shape, mockup. Drag/resize/rotate enabled.</li>
+      <li>Projection presets: flat-front, relaxed-front, oversize-front, hoodie-front, sleeve-badge.</li>
+      <li>Library drawer tabs: Mockups / Designs / Tools.</li>
+      <li>Clear-scene action available for full reset.</li>
+      <li>Export flow: server-side export job + worker ZIP generation.</li>
+    </ul>
+
+    <h3>3.4 Library</h3>
+    <ul>
+      <li>Section management (mockup/design), asset list, duplicate, delete, upload.</li>
+      <li>Two storage operating modes:
+        <ul>
+          <li><strong>Local JSON Foundation:</strong> safe fallback when DB is not configured.</li>
+          <li><strong>Database + R2:</strong> live mode when DATABASE_URL and real R2 credentials are provided.</li>
+        </ul>
+      </li>
+      <li>API: <code>/storage/foundation</code>, <code>/storage/sections</code>, <code>/storage/assets</code>, <code>/storage/uploads/prepare</code>, <code>/storage/uploads/finalize</code>.</li>
+    </ul>
+
+    <h3>3.5 Analytics</h3>
+    <ul>
+      <li>Snapshot history view for Automatic Analysis outputs.</li>
+      <li>Foundation ready for batch comparison trends.</li>
+    </ul>
+
+    <h3>3.6 Automatic Analysis (Competitor Analysis)</h3>
+    <ul>
+      <li>Modes: URL, paste, manual, CSV.</li>
+      <li>Scores: listingStrength, storeStrength, keywordStrength, trustScore, competitionDifficulty, opportunityScore, conversionQuality, demandHeat.</li>
+      <li>Produces risk flags, opportunity notes, and beat map.</li>
+      <li>API: <code>POST /automatic-analysis/analyze</code>, <code>POST /automatic-analysis/save</code>, <code>GET /automatic-analysis/history</code>.</li>
+      <li>Extension handshake: <code>/automatic-analysis/extension-status</code> and <code>/automatic-analysis/extension-ingest</code>.</li>
+    </ul>
+
+    <h3>3.7 Create a List</h3>
+    <ul>
+      <li>SEO + GEO + AEO focused title/description/keyword generation.</li>
+      <li>13-keyword rule set, scoring and improvement notes.</li>
+      <li>Default rule-based mode; AI-assisted mode when <code>OPENAI_API_KEY</code> is configured.</li>
+      <li>API: <code>GET /market-intelligence/foundation</code>, <code>POST /market-intelligence/create-list</code>.</li>
+    </ul>
+
+    <h3>3.8 Settings</h3>
+    <ul>
+      <li>Profile/workspace, localization, appearance, and studio default preferences.</li>
+      <li>API: <code>GET /settings</code>, <code>PUT /settings</code>, <code>POST /settings/reset</code>.</li>
+    </ul>
+
+    <h3>3.9 Billing</h3>
+    <ul>
+      <li>Plan selection, billing cycle, seat count, auto-renew, charge preview, usage, invoices.</li>
+      <li>API: <code>GET /billing</code>, <code>PUT /billing</code>, <code>POST /billing/reset</code>.</li>
+      <li>Local foundation file: <code>apps/api/data/billing.json</code>.</li>
+    </ul>
+
+    <h3>3.10 Admin</h3>
+    <ul>
+      <li>User matrix, role schema, plan/access policies, invitations, audit stream.</li>
+      <li>API: <code>GET /admin</code>, <code>PUT /admin</code>, <code>POST /admin/reset</code>.</li>
+      <li>Local foundation file: <code>apps/api/data/admin.json</code>.</li>
+    </ul>
+
+    <h3>3.11 Platform</h3>
+    <ul>
+      <li>System health board, connector readiness, extension heartbeat.</li>
+      <li>API: <code>/health</code>, <code>/connectors/foundation</code>, <code>/automatic-analysis/extension-status</code>.</li>
+    </ul>
+
+    <h2>4. Core Working Systems (Flows)</h2>
+
+    <h3>4.1 Studio Persistence + Autosave</h3>
+    <ul>
+      <li>Local draft persistence: IndexedDB (<code>printra-studio</code>) + runtime snapshot.</li>
+      <li>Project-scoped keys via <code>project:{projectId}</code>.</li>
+      <li>Local autosave debounce: <code>35ms</code>.</li>
+      <li>Server autosave minimum interval: <code>3000ms</code>.</li>
+      <li>Hash-based panel routing: <code>#mockups</code>, <code>#designs</code>, <code>#tools</code>.</li>
+      <li>Safe route flush hook: <code>window.__printraFlushStudioDraft</code>.</li>
+    </ul>
+
+    <h3>4.2 Library Storage Mode</h3>
+    <ul>
+      <li>System remains operational without DB via local-json foundation.</li>
+      <li>When DB + R2 are configured, signed upload/finalize is enabled.</li>
+      <li>Missing customer credentials return controlled readiness errors, not crashes.</li>
+    </ul>
+
+    <h3>4.3 Automatic Analysis + Extension Flow</h3>
+    <ul>
+      <li>Content script parses Etsy page, background script posts data to API.</li>
+      <li>Extension status TTL is approximately 15 minutes.</li>
+      <li>Ingest triggers analysis engine and optional snapshot save.</li>
+    </ul>
+
+    <h3>4.4 Export Pipeline</h3>
+    <ul>
+      <li>Web submits export payload (<code>POST /exports</code>).</li>
+      <li>API writes queue and status job records.</li>
+      <li>Worker consumes queue, produces ZIP, updates status to completed.</li>
+      <li>Download endpoint: <code>GET /exports/{jobId}/download</code>.</li>
+    </ul>
+
+    <h2>5. Environment Variables</h2>
+    <h3>5.1 API (.env)</h3>
+    <pre>PORT=4000
+DATABASE_URL=postgresql://...
+R2_ACCOUNT_ID=...
+R2_BUCKET=...
+R2_REGION=auto
+R2_ACCESS_KEY_ID=...
+R2_SECRET_ACCESS_KEY=...
+R2_PUBLIC_BASE_URL=
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-5</pre>
+
+    <h3>5.2 Web (.env.local)</h3>
+    <pre>NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
+NEXT_PUBLIC_DEFAULT_ORGANIZATION_ID=...
+NEXT_PUBLIC_CHROME_EXTENSION_URL=https://chrome.google.com/webstore/detail/EXTENSION_ID
+NEXT_PUBLIC_EDGE_EXTENSION_URL=https://microsoftedge.microsoft.com/addons/detail/EXTENSION_ID
+NEXT_PUBLIC_OPERA_EXTENSION_URL=https://addons.opera.com/extensions/details/EXTENSION_ID</pre>
+
+    <h2>6. CMD Run Commands</h2>
+
+    <h3>6.1 Local Development</h3>
+    <pre>cd /d C:\Users\etsy2\OneDrive\Belgeler\New project\analysis-unzip
+pnpm.cmd install
+
+:: API (new terminal)
+pnpm.cmd dev:api
+
+:: WEB (new terminal)
+pnpm.cmd dev:web
+
+:: Worker (optional, required for export pipeline)
+pnpm.cmd --filter @printra/worker dev</pre>
+
+    <h3>6.2 Initial Bootstrap (DB + Organization)</h3>
+    <pre>curl -X POST http://localhost:4000/setup/bootstrap-database
+curl -X POST http://localhost:4000/setup/bootstrap-organization ^
+  -H "Content-Type: application/json" ^
+  -d "{\"name\":\"Main Workspace\",\"slug\":\"main-workspace\",\"plan\":\"starter\"}"</pre>
+
+    <h3>6.3 Build</h3>
+    <pre>cd /d C:\Users\etsy2\OneDrive\Belgeler\New project\analysis-unzip
+pnpm.cmd --filter @printra/web build</pre>
+
+    <h2>7. GitHub Publishing Guide</h2>
+    <pre>cd /d C:\Users\etsy2\OneDrive\Belgeler\New project\analysis-unzip
+git init
+git add .
+git commit -m "Printra initial release"
+git branch -M main
+git remote add origin https://github.com/<user>/<repo>.git
+git push -u origin main</pre>
+
+    <p class="small">If the repository already exists, use your normal <code>git add/commit/push</code> flow.</p>
+
+    <h2>8. Vercel Deployment + Domain Setup</h2>
+
+    <h3>8.1 Web Deploy (from monorepo)</h3>
+    <pre>cd /d C:\Users\etsy2\OneDrive\Belgeler\New project\analysis-unzip
+pnpm dlx vercel@latest login
+pnpm dlx vercel@latest --cwd apps/web
+pnpm dlx vercel@latest --cwd apps/web --prod</pre>
+
+    <h3>8.2 Vercel Environment Variables (Web project)</h3>
+    <ul>
+      <li><code>NEXT_PUBLIC_API_BASE_URL=https://api.your-domain.com</code></li>
+      <li><code>NEXT_PUBLIC_DEFAULT_ORGANIZATION_ID=...</code></li>
+      <li>Extension store URLs (optional but recommended)</li>
+    </ul>
+
+    <h3>8.3 Add Domains</h3>
+    <pre>pnpm dlx vercel@latest domains add your-domain.com
+pnpm dlx vercel@latest domains add www.your-domain.com
+pnpm dlx vercel@latest domains inspect your-domain.com</pre>
+    <p>Apply the A/CNAME records provided by Vercel in your DNS panel.</p>
+
+    <h3>8.4 API/Worker Deployment Note</h3>
+    <p>
+      In this repository, API is an Express service and Worker is a long-running process.
+      For production, deploy API + Worker on a separate Node runtime (VPS / Render / Railway / Fly.io, etc.).
+      Keep Web on Vercel and point it to your API host via <code>NEXT_PUBLIC_API_BASE_URL</code>.
+    </p>
+
+    <h2>9. Chrome Extension (Required for Competitor Analysis)</h2>
+    <ul>
+      <li>Extension path: <code>apps/extension</code></li>
+      <li>Manifest version: v3</li>
+      <li>Host permissions include Etsy + local API/Web hosts</li>
+      <li>API Base can be set from extension popup</li>
+    </ul>
+
+    <h3>9.1 Customer Setup (Development/Test)</h3>
+    <ol>
+      <li>Open Chrome <code>chrome://extensions</code>.</li>
+      <li>Enable <strong>Developer mode</strong>.</li>
+      <li>Use <strong>Load unpacked</strong> and select extension folder.</li>
+      <li>On Etsy listing/shop pages, use "Analyze" / "Sync status" actions.</li>
+    </ol>
+
+    <h3>9.2 Production Note</h3>
+    <p>
+      When moving to customer live domain, update <code>manifest.json</code> host permissions
+      to match production API/Web URLs.
+    </p>
+
+    <h2>10. Recommended Development Roadmap</h2>
+    <h3>Phase 1 - Performance and Stability</h3>
+    <ul>
+      <li>Studio render pipeline profiling for heavy mockup/design scenes.</li>
+      <li>Virtualization and incremental hydration strategies.</li>
+      <li>Autosave conflict telemetry and traceability.</li>
+    </ul>
+
+    <h3>Phase 2 - Infrastructure Hardening</h3>
+    <ul>
+      <li>Versioned DB migration management.</li>
+      <li>Live R2 upload verification + thumbnail generation pipeline.</li>
+      <li>API auth, rate limiting, and extended audit controls.</li>
+    </ul>
+
+    <h3>Phase 3 - Production Operations</h3>
+    <ul>
+      <li>Centralized logging, metrics, and alerting.</li>
+      <li>Backup/restore policy.</li>
+      <li>SLA and incident runbook.</li>
+    </ul>
+
+    <h2>11. Delivery Checklist</h2>
+    <ul>
+      <li>Web + API + Worker processes start and stay healthy.</li>
+      <li>Studio keeps mockup/design state across category navigation.</li>
+      <li>Automatic Analysis extension heartbeat remains stable.</li>
+      <li>Create a List validated in both rule-based and AI-assisted modes.</li>
+      <li>Library section/asset CRUD fully operational.</li>
+      <li>Export job creation and ZIP download verified.</li>
+      <li>Admin/Billing/Settings save-reset flows verified.</li>
+    </ul>
+
+    <p class="small">This document is based on the current real codebase implementation. Additional production hardening may be needed per target environment.</p>
+  </div>
+</body>
+</html>

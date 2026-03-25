@@ -1,0 +1,36 @@
+{
+  "profile": {
+    "displayName": "Printra Operator",
+    "brandName": "Printra Workspace",
+    "supportEmail": "",
+    "supportSignature": "Prepared in Printra"
+  },
+  "workspace": {
+    "workspaceName": "Main Workspace",
+    "organizationId": "demo-org",
+    "defaultProjectPrefix": "Creative",
+    "archiveCompletedProjects": false
+  },
+  "localization": {
+    "locale": "en",
+    "timezone": "Europe/Istanbul",
+    "dateFormat": "dd.MM.yyyy",
+    "measurementUnit": "px"
+  },
+  "studio": {
+    "autosaveDrafts": true,
+    "reopenLastProject": true,
+    "saveLibrarySelections": true,
+    "defaultMockupFit": "contain",
+    "defaultExportFormat": "png"
+  },
+  "appearance": {
+    "defaultTheme": "dark",
+    "brightness": 100,
+    "compactSidebar": false,
+    "accentMode": "sky"
+  },
+  "updatedAt": "2026-03-24T17:43:49.339Z",
+  "createdAt": "2026-03-24T17:43:49.339Z",
+  "foundation": "local-json-settings"
+}
