@@ -112,7 +112,9 @@ function readStoredAuthSession() {
     return null;
   }
   try {
-    const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
+    // Legacy cleanup: persistent sessions are disabled.
+    window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    const raw = window.sessionStorage.getItem(AUTH_STORAGE_KEY);
     if (!raw) {
       return null;
     }
@@ -135,13 +137,15 @@ function persistAuthSession(session: AuthSession) {
   if (typeof window === 'undefined') {
     return;
   }
-  window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+  window.localStorage.removeItem(AUTH_STORAGE_KEY);
+  window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
   writeAuthCookie(session.token, session.expiresAt);
 }
 
 function clearAuthSession() {
   if (typeof window !== 'undefined') {
     window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
   }
   if (typeof document !== 'undefined') {
     document.cookie = `${AUTH_COOKIE_KEY}=; path=/; max-age=0; samesite=lax`;

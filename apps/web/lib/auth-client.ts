@@ -65,7 +65,9 @@ export function readStoredAuthSession(): AuthSession | null {
   }
 
   try {
-    const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
+    // Legacy cleanup: persistent sessions are disabled.
+    window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    const raw = window.sessionStorage.getItem(AUTH_STORAGE_KEY);
     if (!raw) {
       return null;
     }
@@ -92,7 +94,8 @@ export function persistAuthSession(session: AuthSession) {
     return;
   }
 
-  window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+  window.localStorage.removeItem(AUTH_STORAGE_KEY);
+  window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
   writeAuthCookie(session.token, session.expiresAt);
   window.dispatchEvent(new CustomEvent('printra:auth-updated', { detail: { at: getNowIso() } }));
 }
@@ -100,6 +103,7 @@ export function persistAuthSession(session: AuthSession) {
 export function clearAuthSession() {
   if (typeof window !== 'undefined') {
     window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
     window.dispatchEvent(new CustomEvent('printra:auth-updated', { detail: { at: getNowIso() } }));
   }
   if (typeof document !== 'undefined') {

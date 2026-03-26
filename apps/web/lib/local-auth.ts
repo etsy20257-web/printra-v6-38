@@ -213,7 +213,8 @@ async function getStore() {
 
 function upsertStoredSession(session: AuthSession) {
   if (typeof window === 'undefined') return;
-  window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+  window.localStorage.removeItem(AUTH_STORAGE_KEY);
+  window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
 }
 
 export async function localSignupWithEmail(payload: { name: string; email: string; password: string }) {
@@ -331,7 +332,8 @@ export async function localValidateSession(token: string) {
     return null;
   }
 
-  const rawSession = window.localStorage.getItem(AUTH_STORAGE_KEY);
+  window.localStorage.removeItem(AUTH_STORAGE_KEY);
+  const rawSession = window.sessionStorage.getItem(AUTH_STORAGE_KEY);
   if (!rawSession) {
     return null;
   }
