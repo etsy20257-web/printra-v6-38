@@ -9,6 +9,9 @@ function resolveNextTarget(value: string | null) {
   if (!value || !value.startsWith('/')) {
     return '/dashboard';
   }
+  if (value === '/login' || value.startsWith('/login?') || value.startsWith('/signup') || value === '/signup') {
+    return '/dashboard';
+  }
   return value;
 }
 
@@ -25,29 +28,44 @@ export default function LoginPage() {
 
   useEffect(() => {
     let cancelled = false;
+    let redirected = false;
+    const safetyTimer = window.setTimeout(() => {
+      if (!cancelled) {
+        setChecking(false);
+      }
+    }, 7000);
 
     const checkExistingSession = async () => {
-      const session = readStoredAuthSession();
-      if (!session) {
-        if (!cancelled) setChecking(false);
-        return;
-      }
+      try {
+        const session = readStoredAuthSession();
+        if (!session) {
+          return;
+        }
 
-      const validated = await validateAuthSession(session.token);
-      if (!validated) {
-        if (!cancelled) setChecking(false);
-        return;
-      }
+        const validated = await validateAuthSession(session.token);
+        if (!validated) {
+          return;
+        }
 
-      persistAuthSession(validated);
-      if (!cancelled) {
-        router.replace(nextTarget);
+        persistAuthSession(validated);
+        if (!cancelled) {
+          redirected = true;
+          router.replace(nextTarget);
+        }
+      } catch {
+        // Fall back to login form without locking the page.
+      } finally {
+        window.clearTimeout(safetyTimer);
+        if (!cancelled && !redirected) {
+          setChecking(false);
+        }
       }
     };
 
     void checkExistingSession();
     return () => {
       cancelled = true;
+      window.clearTimeout(safetyTimer);
     };
   }, [nextTarget, router]);
 

@@ -9,6 +9,9 @@ function resolveNextTarget(value: string | null) {
   if (!value || !value.startsWith('/')) {
     return '/dashboard';
   }
+  if (value === '/login' || value.startsWith('/login?') || value === '/signup' || value.startsWith('/signup?')) {
+    return '/dashboard';
+  }
   return value;
 }
 

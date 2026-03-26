@@ -9,6 +9,7 @@ import { localLoginWithEmail, localSignupWithEmail, localValidateSession } from 
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').trim().replace(/\/$/, '');
 const HAS_REMOTE_AUTH_API = API_BASE.length > 0;
+const AUTH_REQUEST_TIMEOUT_MS = 6500;
 
 type AuthResponse = {
   ok: boolean;
@@ -114,15 +115,24 @@ async function postAuth(path: '/login' | '/signup', payload: Record<string, unkn
     return localLoginWithEmail(payload as { email: string; password: string });
   }
 
+  const controller = new AbortController();
+  const timeoutId = globalThis.setTimeout(() => controller.abort(), AUTH_REQUEST_TIMEOUT_MS);
+
   let response: Response;
   try {
     response = await fetch(`${API_BASE}/auth${path}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: controller.signal
     });
   } catch {
-    throw new Error('Authentication service is unreachable.');
+    if (path === '/signup') {
+      return localSignupWithEmail(payload as { name: string; email: string; password: string });
+    }
+    return localLoginWithEmail(payload as { email: string; password: string });
+  } finally {
+    globalThis.clearTimeout(timeoutId);
   }
 
   const data = (await response.json().catch(() => ({}))) as AuthResponse;
@@ -154,15 +164,21 @@ export async function validateAuthSession(token: string) {
     return localValidateSession(token);
   }
 
+  const controller = new AbortController();
+  const timeoutId = globalThis.setTimeout(() => controller.abort(), AUTH_REQUEST_TIMEOUT_MS);
+
   let response: Response;
   try {
     response = await fetch(`${API_BASE}/auth/session`, {
       headers: {
         Authorization: `Bearer ${token}`
-      }
+      },
+      signal: controller.signal
     });
   } catch {
-    return null;
+    return localValidateSession(token);
+  } finally {
+    globalThis.clearTimeout(timeoutId);
   }
 
   const data = (await response.json().catch(() => ({}))) as AuthResponse;
