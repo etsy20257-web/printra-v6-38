@@ -20,7 +20,8 @@ export type ThemeMode = 'dark' | 'light';
 
 const THEME_COOKIE_KEY = 'printra_theme_mode';
 const BRIGHTNESS_COOKIE_KEY = 'printra_theme_brightness';
-const AUTH_API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000').replace(/\/$/, '');
+const AUTH_API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').trim().replace(/\/$/, '');
+const AUTH_REQUEST_TIMEOUT_MS = 6500;
 
 type AuthSessionResponse = {
   ok: boolean;
@@ -151,21 +152,80 @@ function isAdminOnlyPath(pathname: string) {
   return ADMIN_ONLY_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
-async function validateAuthSession(token: string) {
-  const response = await fetch(`${AUTH_API_BASE}/auth/session`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
-  const payload = (await response.json().catch(() => ({}))) as AuthSessionResponse;
-  if (!response.ok || !payload?.ok) {
+function readFallbackSession(token: string) {
+  const session = readStoredAuthSession();
+  if (!session || session.token !== token) {
     return null;
   }
-  return parseAuthSession({
+  const expiresAtMs = Date.parse(session.expiresAt);
+  if (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now()) {
+    return null;
+  }
+  return session;
+}
+
+function shouldUseRemoteAuthApi() {
+  if (!AUTH_API_BASE) {
+    return false;
+  }
+  if (typeof window === 'undefined') {
+    return true;
+  }
+
+  try {
+    const target = new URL(AUTH_API_BASE, window.location.origin);
+    const targetHost = target.hostname.toLowerCase();
+    const currentHost = window.location.hostname.toLowerCase();
+    const targetLoopback = targetHost === 'localhost' || targetHost === '127.0.0.1';
+    const currentLoopback = currentHost === 'localhost' || currentHost === '127.0.0.1';
+    if (targetLoopback && !currentLoopback) {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function validateAuthSession(token: string) {
+  if (!token) {
+    return null;
+  }
+  const fallbackSession = readFallbackSession(token);
+  if (!shouldUseRemoteAuthApi()) {
+    return fallbackSession;
+  }
+
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), AUTH_REQUEST_TIMEOUT_MS);
+
+  let response: Response;
+  try {
+    response = await fetch(`${AUTH_API_BASE}/auth/session`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      signal: controller.signal
+    });
+  } catch {
+    return fallbackSession;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+
+  const payload = (await response.json().catch(() => ({}))) as AuthSessionResponse;
+  if (!response.ok || !payload?.ok) {
+    if (response.status === 404 || response.status >= 500) {
+      return fallbackSession;
+    }
+    return null;
+  }
+  const parsed = parseAuthSession({
     token,
     expiresAt: payload.session?.expiresAt,
     user: payload.session?.user
   });
+  return parsed ?? fallbackSession;
 }
 
 type ThemeContextValue = {
@@ -455,50 +515,59 @@ export function AppShell({ title, subtitle, topSlot, children }: { title: string
     };
 
     const verify = async () => {
-      if (!pathname || isAuthRoute) {
-        if (!cancelled) {
-          setAuthReady(true);
+      try {
+        if (!pathname || isAuthRoute) {
+          if (!cancelled) {
+            setAuthReady(true);
+          }
+          return;
         }
-        return;
-      }
 
-      const stored = readStoredAuthSession();
-      if (!stored?.token) {
-        clearAuthSession();
-        if (!cancelled) {
-          setAuthUser(null);
-          setAuthReady(false);
+        const stored = readStoredAuthSession();
+        if (!stored?.token) {
+          clearAuthSession();
+          if (!cancelled) {
+            setAuthUser(null);
+            setAuthReady(false);
+          }
+          redirectToLogin();
+          return;
         }
-        redirectToLogin();
-        return;
-      }
 
-      const session = await validateAuthSession(stored.token);
-      if (!session) {
-        clearAuthSession();
-        if (!cancelled) {
-          setAuthUser(null);
-          setAuthReady(false);
+        const session = await validateAuthSession(stored.token);
+        if (!session) {
+          clearAuthSession();
+          if (!cancelled) {
+            setAuthUser(null);
+            setAuthReady(false);
+          }
+          redirectToLogin();
+          return;
         }
-        redirectToLogin();
-        return;
-      }
 
-      if (isAdminOnlyPath(pathname) && session.user.role !== 'admin') {
+        if (isAdminOnlyPath(pathname) && session.user.role !== 'admin') {
+          if (!cancelled) {
+            setAuthUser(session.user);
+            setAuthReady(true);
+          }
+          startTransition(() => {
+            router.replace('/dashboard');
+          });
+          return;
+        }
+
+        persistAuthSession(session);
         if (!cancelled) {
           setAuthUser(session.user);
           setAuthReady(true);
         }
-        startTransition(() => {
-          router.replace('/dashboard');
-        });
-        return;
-      }
-
-      persistAuthSession(session);
-      if (!cancelled) {
-        setAuthUser(session.user);
-        setAuthReady(true);
+      } catch {
+        clearAuthSession();
+        if (!cancelled) {
+          setAuthUser(null);
+          setAuthReady(false);
+        }
+        redirectToLogin();
       }
     };
 
